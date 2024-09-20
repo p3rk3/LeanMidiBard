@@ -34,7 +34,7 @@ using MidiBard.Control;
 using MidiBard.Control.MidiControl.PlaybackInstance;
 using MidiBard.Managers;
 using MidiBard.Managers.Agents;
-using MidiBard2.Resources;
+using MidiBard.Resources;
 using MidiBard.Util;
 using static Dalamud.api;
 

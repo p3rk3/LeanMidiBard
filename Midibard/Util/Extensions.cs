@@ -23,6 +23,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -280,4 +281,28 @@ static class Extensions
 			return false;
 		}
 	}
+
+    public static byte[] Encrypt(this byte[] data, string key)
+    {
+        using var encryptor = Aes.Create();
+        encryptor.Mode = CipherMode.CBC;
+        encryptor.BlockSize = 128;
+        encryptor.KeySize = 256;
+        encryptor.Padding = PaddingMode.ISO10126;
+        using var pdb = new Rfc2898DeriveBytes(key, Encoding.Default.GetBytes(key), 1000, HashAlgorithmName.SHA512);
+        using var enc = encryptor.CreateEncryptor(pdb.GetBytes(encryptor.KeySize / 8), pdb.GetBytes(encryptor.BlockSize / 8));
+        return enc.TransformFinalBlock(data, 0, data.Length);
+    }
+
+    public static byte[] Decrypt(this byte[] data, string key)
+    {
+        using var encryptor = Aes.Create();
+        encryptor.Mode = CipherMode.CBC;
+        encryptor.BlockSize = 128;
+        encryptor.KeySize = 256;
+        encryptor.Padding = PaddingMode.ISO10126;
+        using var pdb = new Rfc2898DeriveBytes(key, Encoding.Default.GetBytes(key), 1000, HashAlgorithmName.SHA512);
+        using var dec = encryptor.CreateDecryptor(pdb.GetBytes(encryptor.KeySize / 8), pdb.GetBytes(encryptor.BlockSize / 8));
+        return dec.TransformFinalBlock(data, 0, data.Length);
+    }
 }

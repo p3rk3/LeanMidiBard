@@ -48,7 +48,10 @@ internal static class SwitchInstrument
 				MidiBard.CurrentPlayback?.Stop();
 				await SwitchToAsync(instrumentId);
 				if (isPlaying) MidiBard.CurrentPlayback?.Start();
-			}
+
+                if (MidiBard.config.SendNotificationsToPartyChat && MidiBard.CurrentInstrument != 0)
+					Chat.SendMessage($"/p ({string.Join(',', MidiBard.CurrentPlayback.TrackInfos.Where(x => x.IsEnabled).Select(x => x.Index + 1))}) {MidiBard.Instruments[MidiBard.CurrentInstrument].FFXIVDisplayName}");
+            }
 			catch (Exception e)
 			{
 				PluginLog.Error(e, "Error when switching instrument");

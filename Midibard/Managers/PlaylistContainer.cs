@@ -172,6 +172,11 @@ public class SongEntry
 	[ProtoMember(1)] public string FilePath;
 	[ProtoMember(2)] public TimeSpan SongLength;
     [JsonIgnore] private string _name;
-	[JsonIgnore] public string FileName => _name ??= Path.GetFileNameWithoutExtension(FilePath);
-	[JsonIgnore] public string LrcPath => Path.ChangeExtension(FilePath, "lrc");
+	[JsonIgnore]
+	public string FileName
+    {
+        get => _name ??= Path.GetFileNameWithoutExtension(FilePath);
+        set => _name = value;
+    }
+    [JsonIgnore] public string LrcPath => Path.ChangeExtension(FilePath, "lrc");
 }

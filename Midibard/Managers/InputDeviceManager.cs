@@ -28,7 +28,7 @@ using Melanchall.DryWetMidi.Multimedia;
 using MidiBard.Control;
 using Dalamud;
 using Dalamud.Interface.ImGuiNotification;
-using MidiBard2.Resources;
+using MidiBard.Resources;
 using static Dalamud.api;
 
 namespace MidiBard;

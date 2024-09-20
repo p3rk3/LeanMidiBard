@@ -30,15 +30,83 @@ using ImGuiNET;
 using Microsoft.Win32;
 using Dalamud;
 using MidiBard.Managers.Ipc;
-using MidiBard2.Resources;
+using MidiBard.Resources;
 using MidiBard.UI.Win32;
 using MidiBard.Util;
+using MidiBard.GoogleDriveApi;
 
 namespace MidiBard;
 
 public partial class PluginUI
 {
     #region import
+    private void RunImportPrivateKeyTaskWin32()
+    {
+        FileDialogs.OpenJsonFileDialog((result, filePaths) =>
+        {
+            if (result == true)
+            {
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        await GoogleDrive.AddCredential(filePaths[0]);
+                    }
+                    finally
+                    {
+                        IsImportRunning = false;
+                    }
+                });
+            }
+            else
+            {
+                IsImportRunning = false;
+            }
+        });
+    }
+
+    private void RunImportPrivateKeyTaskImGui()
+    {
+        fileDialogManager.OpenFileDialog("Open", ".json", (b, path) =>
+        {
+            if (b)
+            {
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        await GoogleDrive.AddCredential(path);
+                    }
+                    finally
+                    {
+                        IsImportRunning = false;
+                    }
+                });
+            }
+            else
+            {
+                IsImportRunning = false;
+            }
+        });
+    }
+    private void RunImportPrivateKeyTask()
+    {
+        if (!IsImportRunning)
+        {
+            IsImportRunning = true;
+            CheckLastOpenedFolderPath();
+
+            if (MidiBard.config.useLegacyFileDialog)
+            {
+                RunImportPrivateKeyTaskWin32();
+            }
+            else
+            {
+                RunImportPrivateKeyTaskImGui();
+            }
+        }
+    }
+
     private void RunImportFileTask()
     {
         if (!IsImportRunning)

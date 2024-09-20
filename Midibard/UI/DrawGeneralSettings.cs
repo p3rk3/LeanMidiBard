@@ -25,10 +25,10 @@ using FFXIVClientStructs.FFXIV.Client.UI.Misc;
 using ImGuiNET;
 using MidiBard.IPC;
 using MidiBard.Managers;
-using MidiBard2.Resources;
+using MidiBard.Resources;
 using MidiBard.Util;
 using static ImGuiNET.ImGui;
-using static MidiBard2.Resources.Language;
+using static MidiBard.Resources.Language;
 using static Dalamud.api;
 
 namespace MidiBard;

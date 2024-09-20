@@ -28,7 +28,7 @@ using MidiBard.Control.MidiControl;
 using Dalamud.Interface.ImGuiNotification;
 using Dalamud.Interface.Utility;
 using MidiBard.IPC;
-using MidiBard2.Resources;
+using MidiBard.Resources;
 using MidiBard.UI.Win32;
 using MidiBard.Util;
 using static ImGuiNET.ImGui;
@@ -69,7 +69,11 @@ public partial class PluginUI
 				DrawContent();
 				Spacing();
 			}
-		}
+            else if (!IsImportRunning)
+            {
+                DrawCloudBar(220);
+            }
+        }
 
 		void DrawContent()
 		{
@@ -77,7 +81,9 @@ public partial class PluginUI
 			ImGuiUtil.PushIconButtonSize(ImGuiHelpers.ScaledVector2(45.5f, 25));
 
 			if (!IsImportRunning) {
-				if (ImGui.BeginPopup("OpenFileDialog_selection")) {
+                DrawCloudBar();
+
+                if (ImGui.BeginPopup("OpenFileDialog_selection")) {
 					if (ImGui.MenuItem(Language.w32_file_dialog, null, MidiBard.config.useLegacyFileDialog)) {
 						MidiBard.config.useLegacyFileDialog = true;
 					}

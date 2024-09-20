@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Dalamud.Plugin.Ipc;
 
-namespace MidiBard2.IPC
+namespace MidiBard.IPC
 {
     internal class PluginIPC : IDisposable
     {

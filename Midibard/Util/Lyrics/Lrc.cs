@@ -170,7 +170,7 @@ namespace MidiBard.Util.Lyrics
             if (loadSuccessfull)
             {
                 PluginLog.Info($"Load LRC: {lrcPath}");
-                api.ChatGui.Print($"[MidiBard 2] Lyrics Loaded: {lrcPath}");
+                api.ChatGui.Print($"[MidiBard] Lyrics Loaded: {lrcPath}");
             }
         }
 
@@ -220,7 +220,7 @@ namespace MidiBard.Util.Lyrics
             {
                 if (!api.PartyList.IsInParty())
                 {
-                    api.ChatGui.Print(string.Format("[MidiBard 2] Not in a party, Lyrics will not be posted."));
+                    api.ChatGui.Print(string.Format("[MidiBard] Not in a party, Lyrics will not be posted."));
                 }
             }
 

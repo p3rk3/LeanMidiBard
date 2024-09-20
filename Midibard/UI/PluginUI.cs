@@ -51,7 +51,7 @@ using Dalamud.Interface.Utility;
 using MidiBard.IPC;
 using MidiBard.Managers;
 using MidiBard.Managers.Ipc;
-using MidiBard2.Resources;
+using MidiBard.Resources;
 using MidiBard.UI.Win32;
 using MidiBard.Util;
 using Newtonsoft.Json;
@@ -135,10 +135,10 @@ public partial class PluginUI
             SetNextWindowSizeConstraints(new Vector2(ImGuiHelpers.GlobalScale * 357, 0),
                 new Vector2(ImGuiHelpers.GlobalScale * 357, float.MaxValue));
 #if DEBUG
-				if (ImGui.Begin($"MidiBard - {api.ClientState.LocalPlayer?.Name.TextValue} PID{Process.GetCurrentProcess().Id}###MIDIBARD",
+				if (ImGui.Begin($"LeanMidiBard - {api.ClientState.LocalPlayer?.Name.TextValue} PID{Process.GetCurrentProcess().Id}###MIDIBARD",
 					ref MainWindowVisible, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.AlwaysAutoResize | flag))
 #else
-            var name = $"♪ MidiBard 2 v{typeof(PluginUI).Assembly.GetName().Version} ♪ {api.ClientState.LocalPlayer?.Name.TextValue}@{api.ClientState.LocalPlayer?.HomeWorld.GameData.Name.ToString()} ###MIDIBARD";
+            var name = "LeanMidiBard###MIDIBARD";
             if (Begin(name, ref MainWindowVisible, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.AlwaysAutoResize | flag))
 #endif
             {

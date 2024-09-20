@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 using Dalamud.Logging;
 using Microsoft.Win32;
 using Dalamud;
-using MidiBard2.Resources;
+using MidiBard.Resources;
 using MidiBard.Util;
 using System.IO;
 
@@ -36,6 +36,26 @@ static class FileDialogs
     //public delegate void FolderSelectedCallback(bool? fileDialogResult, string folderPath);
 
     //public delegate void SaveFileDialogCallback(bool? fileDialogResult, string filePath);
+
+    public static void OpenJsonFileDialog(Action<bool?, string[]> callback)
+    {
+        var t = new Thread(() =>
+        {
+            var dialog = new OpenFileDialog
+            {
+                Filter = "json file (*.json)|*.json",
+                RestoreDirectory = true,
+                CheckFileExists = true,
+                Multiselect = false,
+                InitialDirectory = MidiBard.config.lastOpenedFolderPath
+            };
+
+            callback(dialog.ShowDialog(), dialog.FileNames);
+        });
+        t.IsBackground = true;
+        t.SetApartmentState(ApartmentState.STA);
+        t.Start();
+    }
 
     public static void OpenMidiFileDialog(Action<bool?, string[]> callback)
     {

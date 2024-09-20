@@ -212,6 +212,8 @@ static class IPCHandles
 
         if (instrument != null)
             SwitchInstrument.SwitchToContinue((uint)instrument);
+        else if (MidiBard.config.SendNotificationsToPartyChat && api.ClientState.LocalPlayer?.ClassJob.Id == 23)
+            Chat.SendMessage($"/p (Nothing) {MidiBard.Instruments[MidiBard.CurrentInstrument].FFXIVDisplayName}");
     }
 
     public static void SetOption(string option, int value, bool includeSelf)
@@ -332,7 +334,7 @@ static class IPCHandles
     {
         var characterName = message.StringData[0];
         PluginLog.Warning($"ERR: Playback Null on character: {characterName}");
-        api.ChatGui.PrintError($"[MidiBard 2] Error: Load song failed on character: {characterName}, please try to switch the song again.");
+        api.ChatGui.PrintError($"[MidiBard] Error: Load song failed on character: {characterName}, please try to switch the song again.");
     }
 
 

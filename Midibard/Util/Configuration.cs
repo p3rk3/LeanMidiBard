@@ -132,6 +132,8 @@ public class Configuration : IPluginConfiguration
     public string lastUsedMidiDeviceName = "";
     public bool autoRestoreListening = false;
     public string lastOpenedFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+    public string GoogleDriveKey = string.Empty;
+    public bool SendNotificationsToPartyChat = true;
     //public bool autoStartNewListening = false;
 
     //public float timeBetweenSongs = 0;

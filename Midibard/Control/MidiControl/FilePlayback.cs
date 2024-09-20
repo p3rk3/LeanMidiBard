@@ -34,6 +34,7 @@ using Melanchall.DryWetMidi.Tools;
 using MidiBard.Control.CharacterControl;
 using MidiBard.Control.MidiControl.PlaybackInstance;
 using Dalamud;
+using MidiBard.GoogleDriveApi;
 using MidiBard.IPC;
 using MidiBard.Managers.Ipc;
 using MidiBard.Util;
@@ -45,18 +46,18 @@ namespace MidiBard.Control.MidiControl;
 
 public static class FilePlayback
 {
-	private static BardPlayback GetPlaybackInstance(MidiFile midifile, string path)
+	private static BardPlayback GetPlaybackInstance(MidiFile midifile, SongEntry songEntry)
 	{
-		PluginLog.Debug($"[LoadPlayback] -> {path} START");
+		PluginLog.Debug($"[LoadPlayback] -> {songEntry.FilePath} START");
 		var stopwatch = Stopwatch.StartNew();
-		var playback = BardPlayback.GetBardPlayback(midifile, path);
+		var playback = BardPlayback.GetBardPlayback(midifile, songEntry);
 		playback.InterruptNotesOnStop = true;
 		playback.TrackNotes = true;
 		playback.TrackProgram = true;
 		playback.Speed = config.PlaySpeed;
 		playback.Finished += Playback_Finished;
-		PluginLog.Debug($"[LoadPlayback] -> {path} OK! in {stopwatch.Elapsed.TotalMilliseconds} ms");
-		api.ChatGui.Print(String.Format("[MidiBard 2] Now Playing: {0}", playback.DisplayName));
+		PluginLog.Debug($"[LoadPlayback] -> {songEntry.FilePath} OK! in {stopwatch.Elapsed.TotalMilliseconds} ms");
+		api.ChatGui.Print(String.Format("[MidiBard] Now Playing: {0}", playback.DisplayName));
 		MidiBard.PluginIpc.MidiBardPlayingFileNamePub.SendMessage(playback.DisplayName);
 		return playback;
 	}
@@ -104,9 +105,15 @@ public static class FilePlayback
 		});
 	}
 
-	internal static async Task<bool> LoadPlayback(string filePath)
+	internal static async Task<bool> LoadPlayback(SongEntry songEntry)
 	{
-		MidiFile midiFile = await Task.Run(() => PlaylistManager.LoadSongFile(filePath));
+		MidiFile midiFile;
+		var filePath = songEntry.FilePath;
+
+		if (Path.IsPathFullyQualified(filePath))
+			midiFile = await Task.Run(() => PlaylistManager.LoadSongFile(filePath));
+		else
+			midiFile = await GoogleDrive.DownloadMidiFile(filePath);
 
 		if (midiFile == null)
 		{
@@ -118,16 +125,16 @@ public static class FilePlayback
 		}
 		else
 		{
-			var playback = await Task.Run(() => GetPlaybackInstance(midiFile, filePath));
+			var playback = await Task.Run(() => GetPlaybackInstance(midiFile, songEntry));
 			CurrentPlayback?.Dispose();
 			CurrentPlayback = playback;
 
 			Ui.RefreshPlotData();
-			MidiBard.BardPlayDevice.ResetChannelStates();
+            MidiBard.BardPlayDevice.ResetChannelStates();
 
-			try
-			{
-				await SwitchInstrument.WaitSwitchInstrumentForSong(Path.GetFileNameWithoutExtension(filePath));
+            try
+            {
+				await SwitchInstrument.WaitSwitchInstrumentForSong(songEntry.FileName);
 			}
 			catch (Exception e)
 			{

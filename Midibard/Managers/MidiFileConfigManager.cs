@@ -261,12 +261,10 @@ namespace MidiBard.Managers
 
 	internal class MidiFileConfig
 	{
-		//public string FileName;
-		//public string FilePath { get; set; }
-		//public int Transpose { get; set; }
-		public List<DbTrack> Tracks = new List<DbTrack>();
-		//public DbChannel[] Channels = Enumerable.Repeat(new DbChannel(), 16).ToArray();
-		//public List<int> TrackToDuplicate = new List<int>();
+        public string FolderId { get; set; }
+        public string FilePath { get; set; }
+        public int Transpose { get; set; }
+        public List<DbTrack> Tracks = new List<DbTrack>();
 		public GuitarToneMode ToneMode = GuitarToneMode.Off;
 		public bool AdaptNotes = true;
 		public float Speed = 1;

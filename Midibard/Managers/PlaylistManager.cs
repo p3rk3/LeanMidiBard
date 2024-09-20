@@ -85,9 +85,17 @@ static class PlaylistManager
 
 	internal static void SetContainerPrivate(PlaylistContainer newContainer) => _currentContainer = newContainer;
 
-	public static List<SongEntry> FilePathList => CurrentContainer.SongPaths;
+    public static List<SongEntry> FilePathList => CurrentContainer.SongPaths;
 
-	public static int CurrentSongIndex
+    public static List<SongEntry> FilePathListLocal = new();
+
+    public static List<(string name, string id)> FoldersRemoteRoot = new();
+
+    public static List<(string parentId, string id)> ConfigsRemoteRoot = new();
+
+    public static List<(string name, string id)> FolderList = new();
+
+    public static int CurrentSongIndex
 	{
 		get => CurrentContainer.CurrentSongIndex;
 		private set => CurrentContainer.CurrentSongIndex = value;
@@ -253,7 +261,7 @@ static class PlaylistManager
 	{
 		try {
 			var songEntry = FilePathList[CurrentSongIndex];
-			return await FilePlayback.LoadPlayback(songEntry.FilePath);
+			return await FilePlayback.LoadPlayback(songEntry);
 		}
 		catch (Exception e) {
 			PluginLog.Warning(e.ToString());

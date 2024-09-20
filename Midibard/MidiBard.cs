@@ -55,7 +55,6 @@ using Dalamud.Game.Gui;
 using Dalamud.Plugin.Services;
 using JetBrains.Annotations;
 using MidiBard.Util.Lyrics;
-using MidiBard2.IPC;
 using static Dalamud.api;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 
@@ -95,7 +94,7 @@ public class MidiBard : IDalamudPlugin
     internal static TimeSpan? CurrentPlaybackTime => CurrentPlayback?.GetCurrentTime<MetricTimeSpan>().GetTimeSpan();
     internal static TimeSpan? CurrentPlaybackDuration => CurrentPlayback?.GetDuration<MetricTimeSpan>().GetTimeSpan();
 
-    public string Name => "MidiBard 2";
+    public string Name => "LeanMidiBard";
 
     public unsafe MidiBard(IDalamudPluginInterface pi)
     {
@@ -356,12 +355,12 @@ public class MidiBard : IDalamudPlugin
         langCode ??= api.PluginInterface.UiLanguage ?? "en";
         try
         {
-            MidiBard2.Resources.Language.Culture = new CultureInfo(langCode);
+            Resources.Language.Culture = new CultureInfo(langCode);
         }
         catch (Exception ex)
         {
             PluginLog.Error(ex, $"Could not set culture to {langCode} - falling back to default");
-            MidiBard2.Resources.Language.Culture = CultureInfo.DefaultThreadCurrentUICulture;
+            Resources.Language.Culture = CultureInfo.DefaultThreadCurrentUICulture;
         }
     }
 

@@ -26,7 +26,7 @@ using static MidiBard.ImGuiUtil;
 using MidiBard.Control.CharacterControl;
 using Dalamud.Logging;
 using MidiBard.Control.MidiControl.PlaybackInstance;
-using MidiBard2.Resources;
+using MidiBard.Resources;
 using MidiBard.Control.MidiControl;
 using static Dalamud.api;
 

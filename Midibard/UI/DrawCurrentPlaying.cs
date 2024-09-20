@@ -22,7 +22,7 @@ using Dalamud.Logging;
 using ImGuiNET;
 using Melanchall.DryWetMidi.Interaction;
 using MidiBard.Control.MidiControl;
-using MidiBard2.Resources;
+using MidiBard.Resources;
 using static Dalamud.api;
 
 namespace MidiBard;

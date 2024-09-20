@@ -39,7 +39,7 @@ namespace MidiBard.Control.MidiControl.PlaybackInstance;
 internal sealed class BardPlayback : Playback
 {
 	private static long[] Cids = new long[100];
-	public static BardPlayback GetBardPlayback(MidiFile file, string filePath)
+	public static BardPlayback GetBardPlayback(MidiFile file, SongEntry songEntry)
 	{
 		PreparePlaybackData(file, out var tempoMap, out var trackChunks, out var trackInfos, out var timedEventWithMetadata);
 
@@ -47,7 +47,7 @@ internal sealed class BardPlayback : Playback
 		// only use midiFileConfig(including Default Performer) when in the party
 		if (api.PartyList.IsInParty())
 		{
-			midiFileConfig = MidiFileConfigManager.GetMidiConfigFromFile(filePath);
+			midiFileConfig = MidiFileConfigManager.GetMidiConfigFromFile(songEntry.FilePath);
 
 			if (midiFileConfig is null || midiFileConfig.Tracks.Count != trackChunks.Length)
 			{
@@ -85,23 +85,23 @@ internal sealed class BardPlayback : Playback
                 {
 					try
 					{
-						midiFileConfig.Save(filePath);
+						midiFileConfig.Save(songEntry.FilePath);
 					}
 					catch (Exception e)
 					{
 					}
 				}
 			}
-		}
+        }
 
 		return new BardPlayback(timedEventWithMetadata, tempoMap)
 		{
 			MidiFile = file,
-			FilePath = filePath,
+			FilePath = songEntry.FilePath,
 			TrackChunks = trackChunks,
 			TrackInfos = trackInfos,
 			MidiFileConfig = midiFileConfig,
-			DisplayName = Path.GetFileNameWithoutExtension(filePath)
+			DisplayName = songEntry.FileName
         };
 	}
 	

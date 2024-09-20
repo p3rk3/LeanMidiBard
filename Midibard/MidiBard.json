@@ -1,0 +1,15 @@
+{
+  "Author": "akira0245, Ori, p3rk3",
+  "Name": "LeanMidiBard",
+  "Punchline": "Bard performance using midi files or keyboard.",
+  "Description": "Bard performance using midi files or keyboard.\n- Solo and ensemble mode support\n- Text commands for instrument equip and switch",
+  "RepoUrl": "https://github.com/p3rk3/MidiBard",
+  "Tags": [ "music", "utility", "midi", "bard" ],
+  "AcceptsFeedback": false,
+  "IconUrl": "https://i.imgur.com/OSxqew4.png",
+  "Changelog": "Dawntrail Update.",
+  "ImageUrls": [
+    "https://i.imgur.com/1R13XF0.png"
+  ],
+  "Apiversion": 10
+}

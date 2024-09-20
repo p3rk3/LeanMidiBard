@@ -31,7 +31,7 @@ using static ImGuiNET.ImGui;
 using MidiBard.Util.Lyrics;
 using MidiBard.Managers.Ipc;
 using static MidiBard.ImGuiUtil;
-using static MidiBard2.Resources.Language;
+using static MidiBard.Resources.Language;
 using static Dalamud.api;
 
 namespace MidiBard;
@@ -126,66 +126,6 @@ public partial class PluginUI
             IPCHandles.SyncAllSettings();
         }
         ImGuiUtil.ToolTip(setting_tooltip_tone_mode);
-
-		//-------------------
-
-		const uint DiscordColor = 0x00F26558;
-		PushStyleColor(ImGuiCol.Button, 0xFF000000 | DiscordColor);
-		PushStyleColor(ImGuiCol.ButtonActive, 0xDD000000 | DiscordColor);
-		PushStyleColor(ImGuiCol.ButtonHovered, 0xAA000000 | DiscordColor);
-		if (Button(" Join Discord "))
-		{
-			try
-			{
-				Extensions.ExecuteCmd("https://discord.gg/ejGt2mXHJM");
-			}
-			catch (Exception e)
-			{
-				PluginLog.Error(e.ToString());
-			}
-		}
-
-		PopStyleColor(3);
-
-		SameLine();
-
-		const uint KofiColor = 0x005E5BFF;
-		PushStyleColor(ImGuiCol.Button, 0xFF000000 | KofiColor);
-		PushStyleColor(ImGuiCol.ButtonActive, 0xDD000000 | KofiColor);
-		PushStyleColor(ImGuiCol.ButtonHovered, 0xAA000000 | KofiColor);
-		if (Button(" Support us on Ko-fi! "))
-		{
-			try
-			{
-				Extensions.ExecuteCmd("https://ko-fi.com/midibard");
-			}
-			catch (Exception e)
-			{
-				PluginLog.Error(e.ToString());
-			}
-		}
-
-		PopStyleColor(3);
-
-		SameLine();
-
-		const uint WebsiteColor = 0x00C7A416;
-		PushStyleColor(ImGuiCol.Button, 0xFF000000 | WebsiteColor);
-		PushStyleColor(ImGuiCol.ButtonActive, 0xDD000000 | WebsiteColor);
-		PushStyleColor(ImGuiCol.ButtonHovered, 0xAA000000 | WebsiteColor);
-		if (Button(" MidiBard.org "))
-		{
-			try
-			{
-				Extensions.ExecuteCmd("https://midibard.org/");
-			}
-			catch (Exception e)
-			{
-				PluginLog.Error(e.ToString());
-			}
-		}
-
-		PopStyleColor(3);
 	}
 
 	private static void SetSpeed()

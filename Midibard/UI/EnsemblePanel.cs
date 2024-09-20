@@ -28,24 +28,28 @@ using MidiBard.Control.CharacterControl;
 using MidiBard.Control.MidiControl.PlaybackInstance;
 using Dalamud;
 using Dalamud.Interface.Utility;
+using MidiBard.GoogleDriveApi;
 using MidiBard.IPC;
 using MidiBard.Managers;
 using MidiBard.Managers.Agents;
 using MidiBard.Managers.Ipc;
 using MidiBard.Util;
-using static MidiBard2.Resources.Language;
+using static MidiBard.Resources.Language;
 using static Dalamud.api;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace MidiBard;
 
 public partial class PluginUI
 {
 	private bool ShowEnsembleControlWindow;
+    private const string ConfigName = "config.json";
 
-	private unsafe void DrawEnsembleControl()
+    private unsafe void DrawEnsembleControl()
 	{
 		if (!ShowEnsembleControlWindow) return;
-		if (!api.PartyList.IsPartyLeader()) return;
+		//if (!api.PartyList.IsPartyLeader()) return;
 
 		ImGui.PushStyleColor(ImGuiCol.TitleBgActive, *ImGui.GetStyleColorVec4(ImGuiCol.WindowBg));
 		ImGui.PushStyleColor(ImGuiCol.TitleBg, *ImGui.GetStyleColorVec4(ImGuiCol.WindowBg));
@@ -56,7 +60,21 @@ public partial class PluginUI
 		if (ImGui.Begin(window_title_ensemble_panel + "###midibardEnsembleWindow", ref ShowEnsembleControlWindow))
 		{
 			ImGuiUtil.PushIconButtonSize(new Vector2(ImGuiHelpers.GlobalScale * 40, ImGui.GetFrameHeight()));
-			var ensembleRunning = MidiBard.AgentMetronome.EnsembleModeRunning;
+
+            if (!GoogleDrive.HasCredential || IsImportRunning || MidiBard.CurrentPlayback == null || PlaylistManager.CurrentSongIndex < 0)
+            {
+                ImGuiUtil.IconButton(FontAwesomeIcon.Upload, "UploadConfig", "Ensemble config is not ready for upload", ImGui.GetColorU32(ImGuiCol.TextDisabled));
+            }
+            else if (ImGuiUtil.IconButton(FontAwesomeIcon.Upload, "UploadConfig", "Upload ensemble config and equip the assigned instrument"))
+            {
+                UploadConfigAndEquipInstrument();
+            }
+
+            ImGui.SameLine();
+            ImGui.Text("	");
+            ImGui.SameLine();
+
+            var ensembleRunning = MidiBard.AgentMetronome.EnsembleModeRunning;
 
 			if (!MidiBard.config.playOnMultipleDevices || (MidiBard.config.playOnMultipleDevices && MidiBard.config.usingFileSharingServices))
 			{
@@ -383,6 +401,7 @@ public partial class PluginUI
 			{
 				ImGui.Checkbox(ensemble_config_Update_instrument_when_begin_ensemble, ref MidiBard.config.UpdateInstrumentBeforeReadyCheck);
 			}
+            ImGui.Checkbox("Send notifications to party chat", ref MidiBard.config.SendNotificationsToPartyChat);
 #if DEBUG
 			try
 			{
@@ -402,9 +421,9 @@ public partial class PluginUI
 				TextUnformatted(e.ToString());
 			}
 #endif
-		}
+        }
 
-		ImGui.End();
+        ImGui.End();
 
 		ImGui.PopStyleColor(2);
 		ImGui.PopStyleVar(2);
@@ -463,4 +482,61 @@ public partial class PluginUI
 
 		return ret;
 	}
+
+    private void UploadConfigAndEquipInstrument()
+    {
+        Task.Run(async () =>
+        {
+            try
+            {
+                IsImportRunning = true;
+
+                var config = MidiBard.CurrentPlayback.MidiFileConfig;
+                config.FolderId = PlaylistManager.FolderList[UIcurrentPlaylistFolder].id;
+                config.FilePath = PlaylistManager.FilePathList[PlaylistManager.CurrentSongIndex].FilePath;
+                config.Transpose = MidiBard.config.TransposeGlobal;
+                config.ToneMode = MidiBard.config.GuitarToneMode;
+                config.AdaptNotes = MidiBard.config.AdaptNotesOOR;
+                config.Speed = MidiBard.config.PlaySpeed;
+
+                var configJson = JsonConvert.SerializeObject(config, Formatting.Indented);
+
+                var name = $"{api.ClientState.LocalPlayer.Name}·{api.ClientState.LocalPlayer.HomeWorld.GameData.Name}";
+                var folderId = PlaylistManager.FoldersRemoteRoot.FirstOrDefault(x => x.name.EndsWith(name)).id;
+                if (folderId == null)
+                {
+                    PluginLog.Warning($"Folder not found for party member {name}");
+                    return;
+                }
+
+                var configId = PlaylistManager.ConfigsRemoteRoot.FirstOrDefault(x => x.parentId == folderId).id;
+                if (configId == null)
+                {
+                    var configs = await GoogleDrive.GetParentIdAndIdByName(ConfigName);
+                    PlaylistManager.ConfigsRemoteRoot.Clear();
+                    PlaylistManager.ConfigsRemoteRoot.AddRange(configs);
+
+                    configId = PlaylistManager.ConfigsRemoteRoot.FirstOrDefault(x => x.parentId == folderId).id;
+                    if (configId == null)
+                    {
+                        configId = await GoogleDrive.CreateText(folderId, ConfigName, configJson);
+                        return;
+                    }
+                }
+
+                await GoogleDrive.UpdateText(configId, configJson);
+
+                if (MidiBard.config.SendNotificationsToPartyChat)
+                {
+                    Chat.SendMessage($"/p {PlaylistManager.FilePathList[PlaylistManager.CurrentSongIndex].FileName}");
+                }
+
+                IPCHandles.UpdateInstrument(true);
+            }
+            finally
+            {
+                IsImportRunning = false;
+            }
+        });
+    }
 }
