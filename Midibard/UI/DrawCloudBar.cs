@@ -60,7 +60,7 @@ public partial class PluginUI
         {
             if (api.ClientState.LocalPlayer != null && GoogleDrive.HasCredential)
             {
-                var myName = $"{api.ClientState.LocalPlayer.Name}·{api.ClientState.LocalPlayer.HomeWorld.GameData.Name}";
+                var myName = $"{api.ClientState.LocalPlayer.Name}·{api.ClientState.LocalPlayer.HomeWorld.Value.Name}";
                 var myFolderIndex = PlaylistManager.FolderList.FindIndex(x => x.name == myName);
                 if (UIcurrentPlaylistFolder == myFolderIndex)
                 {
@@ -149,7 +149,7 @@ public partial class PluginUI
 
                 if (api.ClientState.LocalPlayer != null && GoogleDrive.HasCredential)
                 {
-                    var myName = $"{api.ClientState.LocalPlayer.Name}·{api.ClientState.LocalPlayer.HomeWorld.GameData.Name}";
+                    var myName = $"{api.ClientState.LocalPlayer.Name}·{api.ClientState.LocalPlayer.HomeWorld.Value.Name}";
                     var myFolderId = folders.FirstOrDefault(x => x.name.EndsWith(myName)).id;
                     if (myFolderId == null)
                     {
@@ -238,7 +238,7 @@ public partial class PluginUI
             {
                 IsImportRunning = true;
 
-                var name = api.PartyList.GetPartyLeader()?.NameAndWorld() ?? $"{api.ClientState.LocalPlayer.Name}·{api.ClientState.LocalPlayer.HomeWorld.GameData.Name}";
+                var name = api.PartyList.GetPartyLeader()?.NameAndWorld() ?? $"{api.ClientState.LocalPlayer.Name}·{api.ClientState.LocalPlayer.HomeWorld.Value.Name}";
                 var folderId = PlaylistManager.FoldersRemoteRoot.FirstOrDefault(x => x.name.EndsWith(name)).id;
                 if (folderId == null)
                 {

@@ -9,11 +9,9 @@ using System.Text.RegularExpressions;
 using Dalamud.Interface;
 using Dalamud.Interface.ImGuiNotification;
 using Dalamud.Interface.Utility;
-using Dalamud.Logging;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using Melanchall.DryWetMidi.Interaction;
-using MidiBard.Control.MidiControl;
 using MidiBard.Control.MidiControl.PlaybackInstance;
 using MidiBard.IPC;
 using MidiBard.UI.Win32;
@@ -22,6 +20,7 @@ using MidiBard.Util.Lyrics;
 using static ImGuiNET.ImGui;
 using static MidiBard.ImGuiUtil;
 using static Dalamud.api;
+using Dalamud.Utility;
 
 namespace MidiBard;
 
@@ -50,35 +49,36 @@ public class LrcEditor
     private List<LrcEntry> LrcLines => EditingLrc.LrcLines;
 
     private Lrc LrcPending { get; set; }
-	internal static Lrc GetLrcFromPlayback(BardPlayback currentPlayback)
-	{
-		var newLrc = GetEmptyLrc;
-		if (currentPlayback is not null)
-		{
-			newLrc.LrcMetadata["ti"] = currentPlayback.DisplayName;
-			newLrc.LrcMetadata["length"] = Lrc.ToLrcTime(currentPlayback.GetDuration<MetricTimeSpan>());
-			newLrc.FilePath = Path.ChangeExtension(currentPlayback.FilePath, "lrc");
-		}
+    internal static Lrc GetLrcFromPlayback(BardPlayback currentPlayback)
+    {
+        var newLrc = GetEmptyLrc;
+        if (currentPlayback is not null)
+        {
+            newLrc.LrcMetadata["ti"] = currentPlayback.DisplayName;
+            newLrc.LrcMetadata["length"] = Lrc.ToLrcTime(currentPlayback.GetDuration<MetricTimeSpan>());
+            newLrc.FilePath = Path.ChangeExtension(currentPlayback.FilePath, "lrc");
+        }
 
-		return newLrc;
-	}
-	internal static Lrc GetLrcFromSongEntry(SongEntry songEntry)
-	{
-		var newLrc = GetEmptyLrc;
-		if (songEntry is null) return newLrc;
+        return newLrc;
+    }
+    internal static Lrc GetLrcFromSongEntry(SongEntry songEntry)
+    {
+        var newLrc = GetEmptyLrc;
+        if (songEntry is null) return newLrc;
 
-		var lrcPath = songEntry.LrcPath;
-		if (File.Exists(lrcPath)) {
-			return new Lrc(lrcPath);
-		}
-		PluginLog.Information("file not exist, create new lrc");
+        var lrcPath = songEntry.LrcPath;
+        if (File.Exists(lrcPath))
+        {
+            return new Lrc(lrcPath);
+        }
+        PluginLog.Information("file not exist, create new lrc");
 
         newLrc.LrcMetadata["ti"] = songEntry.FileName;
-		newLrc.LrcMetadata["length"] = Lrc.ToLrcTime(PlaylistManager.LoadSongFile(songEntry.FilePath)?.GetDurationTimeSpan() ?? TimeSpan.Zero);
-		newLrc.FilePath = Path.ChangeExtension(songEntry.FilePath, "lrc");
+        newLrc.LrcMetadata["length"] = Lrc.ToLrcTime(PlaylistManager.LoadSongFile(songEntry.FilePath)?.GetDurationTimeSpan() ?? TimeSpan.Zero);
+        newLrc.FilePath = Path.ChangeExtension(songEntry.FilePath, "lrc");
 
-		return newLrc;
-	}
+        return newLrc;
+    }
     public void LoadLrcToEditor(Lrc lrc)
     {
         if (lrc is null)
@@ -94,7 +94,7 @@ public class LrcEditor
 
         EditingLrc = lrc;
         unsaved = false;
-	}
+    }
 
     private bool TryParseLrcTimeSpan(string input, out TimeSpan timeSpan)
     {
@@ -113,12 +113,12 @@ public class LrcEditor
         return false;
     }
 
-	public bool Visible = false;
-	public void Show() => Visible = true;
-	public void Close() => Visible = false;
-	public unsafe void Draw()
-    {   
-		if (Visible && Begin($"{Path.GetFileName(EditingLrc.FilePath) ?? "Lrc Editor"}###Lyric Editor", ref Visible, unsaved ? ImGuiWindowFlags.UnsavedDocument : ImGuiWindowFlags.None))
+    public bool Visible = false;
+    public void Show() => Visible = true;
+    public void Close() => Visible = false;
+    public unsafe void Draw()
+    {
+        if (Visible && Begin($"{Path.GetFileName(EditingLrc.FilePath) ?? "Lrc Editor"}###Lyric Editor", ref Visible, unsaved ? ImGuiWindowFlags.UnsavedDocument : ImGuiWindowFlags.None))
         {
             if (LrcPending != null)
             {
@@ -127,11 +127,11 @@ public class LrcEditor
 
             var open = true;
             PushStyleVar(ImGuiStyleVar.WindowTitleAlign, new Vector2(0.5f));
-			var wdl = GetWindowDrawList();
-			var clipRect = wdl.GetClipRectMin()+wdl.GetClipRectMax();
-			clipRect /= 2;
-			SetNextWindowPos(clipRect, ImGuiCond.Appearing, Vector2.One / 2);
-			if (BeginPopupModal("Save?", ref open, ImGuiWindowFlags.AlwaysAutoResize))
+            var wdl = GetWindowDrawList();
+            var clipRect = wdl.GetClipRectMin() + wdl.GetClipRectMax();
+            clipRect /= 2;
+            SetNextWindowPos(clipRect, ImGuiCond.Appearing, Vector2.One / 2);
+            if (BeginPopupModal("Save?", ref open, ImGuiWindowFlags.AlwaysAutoResize))
             {
                 ImGui.Dummy(ImGuiHelpers.ScaledVector2(20));
                 TextCenterAligned("Editor has unsaved changes. Save now?");
@@ -218,14 +218,14 @@ public class LrcEditor
 
                     LrcLines.Clear();
                     LrcLines.AddRange(Enumerable.Range(0, count).Select(i => new LrcEntry { TimeStamp = dura / count * i }));
-                    var bNpcNames = api.DataManager.GetExcelSheet<BNpcName>()!.Where(i => !string.IsNullOrWhiteSpace(i.Singular.RawString)).ToList();
+                    var bNpcNames = api.DataManager.GetExcelSheet<BNpcName>()!.Where(i => !string.IsNullOrWhiteSpace(i.Singular.ToDalamudString().TextValue)).ToList();
                     LrcLines.ForEach(i =>
                     {
                         i.Text = string.Join(' ',
-                            bNpcNames[Random.Shared.Next(0, bNpcNames.Count)].Singular.RawString,
-                            bNpcNames[Random.Shared.Next(0, bNpcNames.Count)].Singular.RawString,
+                            bNpcNames[Random.Shared.Next(0, bNpcNames.Count)].Singular.ToDalamudString().TextValue,
+                            bNpcNames[Random.Shared.Next(0, bNpcNames.Count)].Singular.ToDalamudString().TextValue,
                             //bNpcNames[Random.Shared.Next(0, bNpcNames.Count)].Singular.RawString,
-                            bNpcNames[Random.Shared.Next(0, bNpcNames.Count)].Singular.RawString);
+                            bNpcNames[Random.Shared.Next(0, bNpcNames.Count)].Singular.ToDalamudString().TextValue);
                     });
                 }
             }

@@ -16,24 +16,13 @@
 // This code is written by akira0245 and was originally used in the MidiBard project. Any usage of this code must prominently credit the author, akira0245, and indicate that it was originally used in the MidiBard project.
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Windows.Documents;
-using Dalamud.Hooking;
-using Dalamud.Logging;
 using Melanchall.DryWetMidi.Common;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Multimedia;
-using Melanchall.DryWetMidi.Standards;
-using MidiBard.Control.CharacterControl;
-using MidiBard.Control.MidiControl.PlaybackInstance;
-using MidiBard.IPC;
 using MidiBard.Managers;
 using MidiBard.Managers.Agents;
-using MidiBard.Util;
 using playlibnamespace;
 using static Dalamud.api;
 
@@ -113,7 +102,7 @@ public class BardPlayDevice : IOutputDevice
     //    return instrumentDelayFromConfig;
     //}
 
-    private (MidiPlaybackMetaData metadata, int delayms) lastnoteon = (new MidiPlaybackMetaData(-1,-1,-1), 0);
+    private (MidiPlaybackMetaData metadata, int delayms) lastnoteon = (new MidiPlaybackMetaData(-1, -1, -1), 0);
     public void QueuePlaybackMidiEvent(MidiEvent midiEvent, MidiPlaybackMetaData metadata)
     {
         var trackIndex = metadata.TrackIndex;

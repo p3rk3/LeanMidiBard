@@ -212,7 +212,7 @@ static class IPCHandles
 
         if (instrument != null)
             SwitchInstrument.SwitchToContinue((uint)instrument);
-        else if (MidiBard.config.SendNotificationsToPartyChat && api.ClientState.LocalPlayer?.ClassJob.Id == 23)
+        else if (MidiBard.config.SendNotificationsToPartyChat && api.ClientState.LocalPlayer?.ClassJob.RowId == 23)
             Chat.SendMessage($"/p (Nothing) {MidiBard.Instruments[MidiBard.CurrentInstrument].FFXIVDisplayName}");
     }
 
